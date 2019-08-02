@@ -44,7 +44,7 @@ log_data/2018/11/2018-11-13-events.json
 
 And below is an example of what the data in a log file, 2018-11-12-events.json, looks like.
 
-[](images/log-data.png)
+![](images/log-data.png)
 
 A mapping for that event data is also provided.
 
@@ -54,7 +54,7 @@ A mapping for that event data is also provided.
 
 When staging data, nothing need to be modified, so I remain original schema. For analytics tables, I choose to create a star schema. It is shown below:
 
-[](images/schema.png)
+![](images/schema.png)
 
 In this design, Dimension Tables focus on different parts of the data, such as users, songs, artists, time, which is straight forward. All Dimension Tables's primary keys are included in the Fact Table. A single JOIN is needed if you want to get the info of one dimension.
 
