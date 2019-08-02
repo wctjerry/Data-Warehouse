@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS songplays (songplay_id INT IDENTITY(0,1) PRIMARY KEY,
                                       user_id INT NOT NULL,
                                       level TEXT,
                                       song_id TEXT, -- as we are using subset of songs data, so song_id and artist_id might be NULL
-                                      artist_id TEXT,
+                                      artist_id TEXT NOT NULL,
                                       session_id INT, 
                                       location TEXT,
                                       user_agent TEXT)
@@ -69,7 +69,7 @@ CREATE TABLE IF NOT EXISTS songplays (songplay_id INT IDENTITY(0,1) PRIMARY KEY,
 user_table_create = ("""
 CREATE TABLE IF NOT EXISTS users (user_id INT PRIMARY KEY,
                                   first_name TEXT,
-                                  last_name TEXT,
+                                  last_name TEXT NOT NULL,
                                   gender TEXT,
                                   level TEXT)
 """)
@@ -133,26 +133,29 @@ SELECT e.ts AS start_time,
         e.userAgent AS user_agent
         
 FROM staging_events e JOIN staging_songs s ON e.song = s.title  
-WHERE e.userId IS NOT NULL AND e.ts IS NOT NULL
+WHERE e.userId IS NOT NULL 
+        AND e.ts IS NOT NULL
+        AND e.page = 'NextSong'
 """)
 
 
 user_table_insert = ("""
 INSERT INTO users (user_id, first_name, last_name, gender, level)
-SELECT e.userId AS user_id,
+SELECT DISTINCT e.userId AS user_id,
         e.firstName AS first_name,
         e.lastName AS last_name,
         e.gender,
         e.level
 
 FROM staging_events e
-WHERE user_id IS NOT NULL
+WHERE e.userId IS NOT NULL
+        AND e.page = 'NextSong'
 """)
 
 
 song_table_insert = ("""
 INSERT INTO songs (song_id, title, artist_id, year, duration)
-SELECT s.song_id,
+SELECT DISTINCT s.song_id,
         s.title,
         s.artist_id,
         s.year,
@@ -164,7 +167,7 @@ FROM staging_songs s
 
 artist_table_insert = ("""
 INSERT INTO artists (artist_id, name, location, latitude, longitude)
-SELECT s.artist_id,
+SELECT DISTINCT s.artist_id,
         s.artist_name AS name,
         s.artist_location AS location,
         s.artist_latitude AS latitude,
@@ -176,7 +179,7 @@ FROM staging_songs s
 
 time_table_insert = ("""
 INSERT INTO time (start_time, hour, day, week, month, year, weekday)
-SELECT e.ts AS start_time,
+SELECT DISTINCT e.ts AS start_time,
         date_part('hour', e.timestamp) AS hour,
         date_part('day', e.timestamp) AS day,
         date_part('week', e.timestamp) AS week,
