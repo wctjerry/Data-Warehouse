@@ -79,6 +79,14 @@ The project  includes four main files:
 9. Implement the logic in `etl.py` to load data from staging tables to analytics tables on Redshift.
 10. Test by running `etl.py` after running `create_tables.py`
 
+### How to use
+
+1. Launch a redshift cluster and create an IAM role that has read access to S3.
+2. Add redshift database and IAM role info to `dwh.cfg`.
+3. Run `create_tables.py` to create tables needed.
+4. Run `etl.py` to extract, transform and load data to analytical tables.
+5. Run analytical queries to answer questions.
+
 ### Analytical Insights
 
 To answer anlytics team's question `Three most popular song according to different months and levels of users in year 2018`, I write a query to fetch the data:
